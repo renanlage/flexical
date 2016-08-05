@@ -88,6 +88,9 @@ ENV/
 # Rope project settings
 .ropeproject
 
+# IDE settings
+.idea/
+
 # Ignore some lexicons
 lexicons/liwc.dic
 
