@@ -1,11 +1,9 @@
-from collections import Counter
 from unittest.case import TestCase
 
-from flexical.socal.socal import load_hotel_reviews
+from flexical.socal.socal import Socal
 
 
-class LoadHotelReviews(TestCase):
-    def test_return_correct_dict(self):
-        reviews = load_hotel_reviews(stem_words=True)
-
-        print Counter(score for _, score in reviews)
+class SocalTest(TestCase):
+    def test_return_something(self):
+        socal = Socal()
+        print socal.scores()[:100]
