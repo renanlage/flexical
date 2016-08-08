@@ -73,7 +73,7 @@ class Socal(object):
 
             elif self.use_negators and word in self.negators:
                 end_index = self.index_of_next_clause_break(review, index, max_steps=8)
-                self.apply_multiplier_to_mask(mask, 0, index + 1, end_index)
+                self.apply_multiplier_to_mask(mask, -1, index + 1, end_index)
 
         return mask
 
