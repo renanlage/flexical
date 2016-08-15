@@ -4,13 +4,13 @@ from flexical.socal.socal import Socal
 from flexical.lexicons import load_oplexicon
 
 
-def confusion_matrix(scores, labels, average=0, error=0):
+def confusion_matrix(scores, labels, average=0):
     matrix = {'true_positive': 0, 'true_negative': 0, 'false_positive': 0, 'false_negative': 0}
 
     for i in xrange(len(scores)):
-        if scores[i] > average + error:
+        if scores[i] > average:
             predicted_label = 1
-        elif scores[i] < average - error:
+        elif scores[i] < average:
             predicted_label = -1
         else:
             predicted_label = 0
@@ -90,8 +90,3 @@ def measure_socal():
     conf_matrix = confusion_matrix(scores, labels)
 
     print '+0', accuracy(conf_matrix)
-
-
-
-
-

@@ -62,9 +62,9 @@ def remove_accents(word):
 
 
 def remove_repeated_letters(word):
-    # Do not remove repeated letters only if letters are r, s, m or n
-    regex = r'([a-z&&[^rsmn]])\1+'
-    return re.sub(regex, r'\1', word)
+    # Do not remove repeated letters only if letters are r, s, m, n or c
+    regex = r'([^\W\drsmnc])\1+'
+    return re.sub(regex, r'\1', word, re.UNICODE)
 
 
 # Utils
