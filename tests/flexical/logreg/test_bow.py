@@ -1,8 +1,8 @@
 from unittest.case import TestCase
 
-from flexical.logreg.bow import review_as_bag_of_words_features, classify
+from flexical.logreg.bow import build_lexicon
 
 
 class ReviewAsBagOfWordsTest(TestCase):
     def test_return_corect_bow(self):
-        classify()
+        build_lexicon(threshold=0.3)

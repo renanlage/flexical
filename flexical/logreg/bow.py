@@ -1,20 +1,12 @@
 # -*- coding: utf-8 -*-
+import io
+import operator
 
 import nltk
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.linear_model.logistic import LogisticRegression
 
 from flexical.socal.hotels import load_hotel_reviews_with_label
-
-import nltk
-import random
-#from nltk.corpus import movie_reviews
-from nltk.classify.scikitlearn import SklearnClassifier
-import pickle
-from sklearn.naive_bayes import MultinomialNB, BernoulliNB
-from sklearn.linear_model import LogisticRegression, SGDClassifier
-from sklearn.svm import SVC, LinearSVC, NuSVC
-from nltk.classify import ClassifierI
-from nltk.tokenize import word_tokenize
 
 
 def review_as_bag_of_words_features():
@@ -32,20 +24,42 @@ def review_as_bag_of_words_features():
     return bows, vectorizer.get_feature_names(), labels
 
 
-def bow_to_nltk_features(bow):
-    import ipdb; ipdb.set_trace()
-    return {word_index: frequency for word_index, frequency in enumerate(bow)}
+def associate_coefficients_to_words(coefs, vocabulary):
+    assert len(vocabulary) == coefs.size
+    return {vocabulary[i]: coefs.item(i) for i in xrange(len(vocabulary))}
 
 
-def classify():
-    bows, vocabulary, labels = review_as_bag_of_words_features()
-    features = [bow_to_nltk_features(bow) for bow in bows]
+def show_high_and_low_coef_words(words_coefs, show_count=10):
+    print '{} words with the highest coefficients:'.format(show_count)
 
-    # training_set = [()]
-    #
-    # classifier = LogisticRegression().fit(training_set, labels)
-    # classifier.train(training_set)
-    #
-    # print u'Acurácia: {}'.format(nltk.classify.accuracy(classifier, testing_set) * 100)
+    for word, coef in sorted(words_coefs.iteritems(), key=operator.itemgetter(1), reverse=True)[:show_count]:
+        print '{}\t\t{}'.format(coef, word)
+
+    print '\n{} words with the lowest coefficients:'.format(show_count)
+
+    for word, coef in sorted(words_coefs.iteritems(), key=operator.itemgetter(1), reverse=False)[:show_count]:
+        print '{}\t\t{}'.format(coef, word)
 
 
+def extract_logistic_regression_coefficients(bows, vocabulary, labels):
+    classifier = LogisticRegression().fit(bows, labels)
+    words_coefs = associate_coefficients_to_words(classifier.coef_, vocabulary)
+    show_high_and_low_coef_words(words_coefs)
+
+    return words_coefs
+
+
+def export_lexicon_to_file(filename, lexicon):
+    with io.open(filename, 'w', encoding='utf-8') as _file:
+        for word, coef in lexicon.iteritems():
+            _file.write(u'{}, {}\n'.format(word, coef))
+
+
+def build_lexicon(features_extracting_func=review_as_bag_of_words_features, bias=0, threshold=0.1):
+    bows, vocabulary, labels = features_extracting_func()
+    words_coefs = extract_logistic_regression_coefficients(bows, vocabulary, labels)
+
+    lexicon = {word: coef for word, coef in words_coefs.iteritems() if coef > bias + threshold or coef < bias - threshold}
+    export_lexicon_to_file('flexical/lexicons/mylex.csv', lexicon)
+
+    return lexicon
