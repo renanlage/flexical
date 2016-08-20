@@ -32,5 +32,5 @@ class LoadHotelReviewsTest(TestCase):
             for word in reviews[i]:
                 self.assertIsInstance(word, unicode)
 
-    # def test_merge_hotels_reviews(self):
-    #     merge_hotels_reviews_to_one_file()
+    def test_merge_hotels_reviews(self):
+        merge_hotels_reviews_to_one_file()

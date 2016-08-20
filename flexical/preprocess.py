@@ -11,13 +11,15 @@ sentence_tokenizer = nltk.data.load('tokenizers/punkt/portuguese.pickle')
 
 
 def preprocess_text(text, word_transforms=(), ignored_words=()):
+    processed_text = fix_punctuation(text)
+
     # Tokenize raw text by sentence and then by word
-    for sentence in tokenize_sentences(text):
+    for sentence in tokenize_sentences(processed_text):
         for word in tokenize_words(sentence):
             word = word.lower()
 
             # Ignore given words
-            if word not in ignored_words:
+            if word not in ignored_words and not re.match(r'\d', word, re.UNICODE):
                 # Apply word transformation for each word
                 yield apply_transforms(word, word_transforms)
 
@@ -38,6 +40,14 @@ def raw_read(filename, encoding):
 def raw_write(filename, encoding, text):
     with io.open(filename, 'w', encoding=encoding) as _file:
         _file.write(text)
+
+
+# Spelling correction functions
+
+def fix_punctuation(text):
+    fixed_text = re.sub(r'([.,;?!])([^\W\d_])', r'\1 \2', text, flags=re.UNICODE)
+    fixed_text = re.sub(r'([^\.])(\.\.) ', r'\1... ', fixed_text, flags=re.UNICODE)
+    return re.sub(r'([^\.])(\.\.\.\.+) ', r'\1... ', fixed_text, flags=re.UNICODE)
 
 
 # Tokenizer functions

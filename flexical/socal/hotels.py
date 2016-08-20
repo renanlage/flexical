@@ -9,12 +9,13 @@ def load_hotel_reviews_with_polarity(stem_words=False):
     word_transforms = [remove_repeated_letters, remove_accents]
 
     if stem_words:
-        word_transforms.insert(0, stem_word)
+        word_transforms.insert(1, stem_word)
 
     with io.open('flexical/data/hotels.txt', 'r', encoding='utf-8') as _file:
         while True:
             raw_review = _file.readline()
-            polarity = int(_file.readline())
+            rating = int(_file.readline().rstrip())
+            polarity = rating_to_polarity(rating)
 
             # Ignore neutral reviews with rating = 3 / polarity = 0
             if polarity != 0:
@@ -40,26 +41,19 @@ def rating_to_polarity(rating):
 
 
 def merge_hotels_reviews_to_one_file():
-    reviews_with_polarity = set()
+    reviews_count = 0
+    reviews_with_rating = set()
     reviews_filenames = ('flexical/data/hotels2.txt', 'flexical/data/hotels_orig.txt', 'flexical/data/hotelsdev.txt',
                          'flexical/data/hotelstest.txt')
-
-    reviews_count = 0
-    polarized_reviews_count = 0
 
     for filename in reviews_filenames:
         with io.open(filename, 'r', encoding='latin-1') as _file:
             while True:
+                reviews_count += 1
                 review = _file.readline().rstrip()
                 rating = int(_file.readline().rstrip())
-                polarity = rating_to_polarity(rating)
 
-                reviews_count += 1
-
-                # Ignore neutral reviews with rating = 3 / polarity = 0
-                if polarity != 0:
-                    polarized_reviews_count += 1
-                    reviews_with_polarity.add((review, polarity))
+                reviews_with_rating.add((review, rating))
 
                 # Jump blank line after rating
                 # stop reading if end of file reached
@@ -74,15 +68,15 @@ def merge_hotels_reviews_to_one_file():
 
     print '\n\n\n'
     print 'Total number of reviews: ', reviews_count
-    print 'Total number of polarized reviews: ', polarized_reviews_count
 
-    print 'Total number of distinct polarized reviews: ', len(reviews_with_polarity)
-    print 'Total number of distinct positive reviews: ', sum(1 for _, polarity in reviews_with_polarity if polarity == 1)
-    print 'Total number of distinct negative reviews: ', sum(1 for _, polarity in reviews_with_polarity if polarity == -1)
+    print 'Total number of distinct reviews: ', len(reviews_with_rating)
+    print 'Total number of distinct positive reviews: ', sum(1 for _, rating in reviews_with_rating if rating > 3)
+    print 'Total number of distinct negative reviews: ', sum(1 for _, rating in reviews_with_rating if rating < 3)
+    print 'Total number of distinct neutral reviews: ', sum(1 for _, rating in reviews_with_rating if rating == 3)
 
     with io.open('flexical/data/hotels.txt', 'w', encoding='utf-8') as _file:
-        for index, (review, polarity) in enumerate(reviews_with_polarity):
-            if index < len(reviews_with_polarity) - 1:
-                _file.write(u'{}\n{}\n\n'.format(review, polarity))
+        for index, (review, rating) in enumerate(reviews_with_rating):
+            if index < len(reviews_with_rating) - 1:
+                _file.write(u'{}\n{}\n\n'.format(review, rating))
             else:
-                _file.write(u'{}\n{}'.format(review, polarity))
+                _file.write(u'{}\n{}'.format(review, rating))
