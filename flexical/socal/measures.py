@@ -1,10 +1,7 @@
 from __future__ import division
 
-from flexical.socal.socal import Socal
-from flexical.lexicons import load_oplexicon
 
-
-def confusion_matrix(scores, labels, average=0):
+def confusion_matrix(scores, labels, average=2):
     matrix = {'true_positive': 0, 'true_negative': 0, 'false_positive': 0, 'false_negative': 0}
 
     for i in xrange(len(scores)):
@@ -60,33 +57,7 @@ def fscore(precision, recall):
     return 2 * precision * recall / (precision + recall)
 
 
-def measure_socal():
-    scores, labels = Socal(load_oplexicon, use_intensifiers=False, use_irrealis=False, use_negators=False).scores()
+def measure_socal(scores, labels):
     conf_matrix = confusion_matrix(scores, labels)
 
-    print '{}', accuracy(conf_matrix)
-
-    scores, labels = Socal(load_oplexicon, use_intensifiers=False, use_irrealis=False, use_negators=True).scores()
-    conf_matrix = confusion_matrix(scores, labels)
-
-    print '-', accuracy(conf_matrix)
-
-    scores, labels = Socal(load_oplexicon, use_intensifiers=False, use_irrealis=True, use_negators=False).scores()
-    conf_matrix = confusion_matrix(scores, labels)
-
-    print '0', accuracy(conf_matrix)
-
-    scores, labels = Socal(load_oplexicon, use_intensifiers=True, use_irrealis=False, use_negators=False).scores()
-    conf_matrix = confusion_matrix(scores, labels)
-
-    print '+', accuracy(conf_matrix)
-
-    scores, labels = Socal(load_oplexicon, use_intensifiers=True, use_irrealis=True, use_negators=True).scores()
-    conf_matrix = confusion_matrix(scores, labels)
-
-    print '+0-', accuracy(conf_matrix)
-
-    scores, labels = Socal(load_oplexicon, use_intensifiers=True, use_irrealis=True, use_negators=False).scores()
-    conf_matrix = confusion_matrix(scores, labels)
-
-    print '+0', accuracy(conf_matrix)
+    return accuracy(conf_matrix)
