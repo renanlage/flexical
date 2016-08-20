@@ -71,18 +71,3 @@ def remove_repeated_letters(word):
 
 def word_vec_to_string(word_vec):
     return u' '.join(word_vec)
-
-
-def main():
-    text = raw_read('data/hotels.txt', 'latin-1')
-    stopwords = nltk.corpus.stopwords.words('portuguese')
-    punctuation = ['.', ',', ';', ':', '?', '!', '""', "''", "``"]
-    word_transforms = (stem_word,)
-
-    preprocessed_text = list(preprocess_text(text, word_transforms))
-    print preprocessed_text[:200]
-    raw_write('output.txt', 'utf-8', word_vec_to_string(preprocessed_text))
-
-
-if __name__ == "__main__":
-    main()
