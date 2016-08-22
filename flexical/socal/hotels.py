@@ -1,6 +1,7 @@
 import io
 
-from flexical.preprocess import preprocess_text, stem_word, remove_accents, remove_repeated_letters
+from flexical.text_processing.preprocess import preprocess_text, stem_word, remove_accents
+from flexical.text_processing.spelling_correction import remove_repeated_letters
 
 
 def load_hotel_reviews_with_polarity(stem_words=False):

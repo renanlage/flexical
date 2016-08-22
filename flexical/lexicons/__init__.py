@@ -2,7 +2,7 @@
 
 import io
 
-from flexical.preprocess import stem_word, remove_accents, apply_transforms
+from flexical.text_processing.preprocess import stem_word, remove_accents, apply_transforms
 
 
 def load_oplexicon(accepted_lex_types=('adj', 'emot'), stem_words=False):

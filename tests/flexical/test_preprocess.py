@@ -1,6 +1,6 @@
 from unittest.case import TestCase
 
-from flexical.preprocess import remove_repeated_letters
+from flexical.text_processing.spelling_correction import remove_repeated_letters
 
 
 class RemoveRepeatedLettersTest(TestCase):
