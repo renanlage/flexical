@@ -10,18 +10,19 @@ from flexical.text_processing.bow import BowGenerator
 
 class LexiconGenerator(object):
     def __init__(self, dataset_loader, apply_socal_mask=True, mask_max_steps=10, remove_stopwords=False,
-                 stem_words=False, bias=0, threshold=0.27):
+                 ignored_words = (), stem_words=False, bias=0, threshold=0.27):
         self.dataset_loader = dataset_loader
         self.stem_words = stem_words
         self.mask_max_steps = mask_max_steps
         self.stopwords = nltk.corpus.stopwords.words('portuguese') if remove_stopwords else ()
+        self.ignored_words = ignored_words
         self.apply_socal_mask = apply_socal_mask
         self.bias = bias
         self.threshold = threshold
 
     def build_lexicon(self, filename=None):
         # Load dataset and gold labels
-        docs, polarities = self.dataset_loader(stem_words=self.stem_words)
+        docs, polarities = self.dataset_loader(stem_words=self.stem_words, ignored_words=self.ignored_words)
 
         # Represent dataset as bag of words features
         bow_generator = BowGenerator(apply_socal_mask=self.apply_socal_mask, mask_max_steps=self.mask_max_steps,

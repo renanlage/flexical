@@ -1,14 +1,14 @@
 import io
 from os import path
 
-from flexical.text_processing.preprocess import remove_accents, stem_word, apply_transforms
+from flexical.text_processing.preprocess import remove_accents, stem_word, preprocess_text
 from flexical.text_processing.spelling_correction import remove_repeated_letters
 
 
-def load_reli_reviews_with_polarity(stem_words=False):
+def load_reli_reviews_with_polarity(stem_words=False, ignored_words=()):
     reviews = []
     polarities = []
-    word_transforms = [unicode.lower, remove_repeated_letters, remove_accents]
+    word_transforms = [remove_repeated_letters, remove_accents]
 
     if stem_words:
         word_transforms.insert(2, stem_word)
@@ -16,7 +16,7 @@ def load_reli_reviews_with_polarity(stem_words=False):
     authors = ("Amado", "Meyer", "Orwell", "Reboucas", "Salinger", "Saramago", "Sheldon")
 
     for filename in (path.abspath('flexical/data/ReLi-{}.txt'.format(author)) for author in authors):
-        with io.open(filename, 'r', encoding='latin-1') as _file:
+        with io.open(filename, 'r', encoding='utf-8') as _file:
             review_words = []
             review_polarity = 0
             in_review = False
@@ -35,14 +35,15 @@ def load_reli_reviews_with_polarity(stem_words=False):
 
                     if stripped_line:
                         word_info = stripped_line.split('\t')
-                        word = apply_transforms(word_info[0], word_transforms)
+                        word = word_info[0]
                         word_polarity = polarity_to_int(word_info[4])
 
                         review_words.append(word)
                         review_polarity += word_polarity
                     else:
                         if review_polarity != 0:
-                            reviews.append(review_words)
+                            review = list(preprocess_text(u' '.join(review_words), word_transforms, ignored_words))
+                            reviews.append(review)
                             polarities.append(1 if review_polarity > 0 else -1)
 
                         review_words = []

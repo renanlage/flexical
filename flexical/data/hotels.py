@@ -5,7 +5,7 @@ from flexical.text_processing.preprocess import preprocess_text, stem_word, remo
 from flexical.text_processing.spelling_correction import remove_repeated_letters
 
 
-def load_hotel_reviews_with_polarity(stem_words=False):
+def load_hotel_reviews_with_polarity(stem_words=False, ignored_words=()):
     reviews = []
     polarities = []
     word_transforms = [remove_repeated_letters, remove_accents]
@@ -21,7 +21,7 @@ def load_hotel_reviews_with_polarity(stem_words=False):
 
             # Ignore neutral reviews with rating = 3 / polarity = 0
             if polarity != 0:
-                processed_review = list(preprocess_text(raw_review, word_transforms))
+                processed_review = list(preprocess_text(raw_review, word_transforms, ignored_words))
                 reviews.append(processed_review)
                 polarities.append(polarity)
 

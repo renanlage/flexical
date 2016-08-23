@@ -2,9 +2,11 @@ from flexical.text_processing.preprocess import stem_word
 
 
 class Socal(object):
-    def __init__(self, stem_words=False, mask_max_steps=10, use_intensifiers=True, use_irrealis=True, use_negators=True):
+    def __init__(self, stem_words=False, mask_max_steps=10, ignored_words=(),
+                 use_intensifiers=True, use_irrealis=True, use_negators=True):
         self.stem_words = stem_words
         self.mask_max_steps = mask_max_steps
+        self.ignored_words = ignored_words
         self.use_intensifiers = use_intensifiers
         self.use_irrealis = use_irrealis
         self.use_negators = use_negators
@@ -39,7 +41,7 @@ class Socal(object):
             self.words_with_no_polarity = {stem_word(word) for word in self.words_with_no_polarity}
 
     def calculate_scores(self, lexicon_loader, dataset_loader):
-        texts, polarities = dataset_loader(stem_words=self.stem_words)
+        texts, polarities = dataset_loader(stem_words=self.stem_words, ignored_words=self.ignored_words)
         lexicon = lexicon_loader(stem_words=self.stem_words)
 
         socal_scores = []
