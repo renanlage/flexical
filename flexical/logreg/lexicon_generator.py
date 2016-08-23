@@ -10,7 +10,7 @@ from flexical.text_processing.bow import BowGenerator
 
 class LexiconGenerator(object):
     def __init__(self, dataset_loader, apply_socal_mask=True, mask_max_steps=10, remove_stopwords=False,
-                 stem_words=False, bias=0, threshold=0.3):
+                 stem_words=False, bias=0, threshold=0.27):
         self.dataset_loader = dataset_loader
         self.stem_words = stem_words
         self.mask_max_steps = mask_max_steps

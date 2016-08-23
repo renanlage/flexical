@@ -12,6 +12,11 @@ def fix_ellipsis(text):
 # Word related fixings
 
 def remove_repeated_letters(word):
-    # Do not remove repeated letters only if letters are r, s, m, n or c
-    regex = r'([^\W\drsmnc])\1+'
-    return re.sub(regex, r'\1', word, re.UNICODE)
+    # Do not remove repeated letters only if letters are r, s, m, n, c or z
+    no_repeat_regex = r'([^\W\drsmncz])\1+'
+    word = re.sub(no_repeat_regex, r'\1', word, re.UNICODE)
+
+    one_repeat_regex = r'([drsmncz])\1\1+'
+    word = re.sub(one_repeat_regex, r'\1\1', word, re.UNICODE)
+
+    return word

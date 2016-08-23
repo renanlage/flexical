@@ -5,7 +5,7 @@ import io
 from flexical.text_processing.preprocess import stem_word, remove_accents, apply_transforms
 
 
-def load_oplexicon(accepted_lex_types=('adj', 'emot'), stem_words=False):
+def load_oplexicon(accepted_lex_types=('adj', 'emot', 'vb'), stem_words=False):
     lexicon = {}
     word_transforms = [remove_accents]
 

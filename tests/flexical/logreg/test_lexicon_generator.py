@@ -1,7 +1,7 @@
 from unittest.case import TestCase
 
+from flexical.data.hotels import load_hotel_reviews_with_polarity
 from flexical.logreg.lexicon_generator import LexiconGenerator
-from flexical.socal.hotels import load_hotel_reviews_with_polarity
 
 
 class LexiconGeneratorTest(TestCase):

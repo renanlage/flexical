@@ -92,5 +92,4 @@ ENV/
 .idea/
 
 # Ignore some lexicons
-lexicons/liwc.dic
-
+flexical/lexicons/flexical*

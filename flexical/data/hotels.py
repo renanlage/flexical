@@ -1,4 +1,5 @@
 import io
+from os import path
 
 from flexical.text_processing.preprocess import preprocess_text, stem_word, remove_accents
 from flexical.text_processing.spelling_correction import remove_repeated_letters
@@ -12,7 +13,7 @@ def load_hotel_reviews_with_polarity(stem_words=False):
     if stem_words:
         word_transforms.insert(1, stem_word)
 
-    with io.open('flexical/data/hotels.txt', 'r', encoding='utf-8') as _file:
+    with io.open(path.abspath('flexical/data/hotels.txt'), 'r', encoding='utf-8') as _file:
         while True:
             raw_review = _file.readline()
             rating = int(_file.readline().rstrip())
@@ -48,7 +49,7 @@ def merge_hotels_reviews_to_one_file():
                          'flexical/data/hotelstest.txt')
 
     for filename in reviews_filenames:
-        with io.open(filename, 'r', encoding='latin-1') as _file:
+        with io.open(path.abspath(filename), encoding='latin-1') as _file:
             while True:
                 reviews_count += 1
                 review = _file.readline().rstrip()
@@ -75,7 +76,7 @@ def merge_hotels_reviews_to_one_file():
     print 'Total number of distinct negative reviews: ', sum(1 for _, rating in reviews_with_rating if rating < 3)
     print 'Total number of distinct neutral reviews: ', sum(1 for _, rating in reviews_with_rating if rating == 3)
 
-    with io.open('flexical/data/hotels.txt', 'w', encoding='utf-8') as _file:
+    with io.open(path.abspath('flexical/data/hotels.txt'), 'w', encoding='utf-8') as _file:
         for index, (review, rating) in enumerate(reviews_with_rating):
             if index < len(reviews_with_rating) - 1:
                 _file.write(u'{}\n{}\n\n'.format(review, rating))

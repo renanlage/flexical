@@ -1,7 +1,7 @@
 from unittest.case import TestCase
 
+from flexical.data.hotels import load_hotel_reviews_with_polarity
 from flexical.lexicons import load_oplexicon
-from flexical.socal.hotels import load_hotel_reviews_with_polarity
 from flexical.socal.measures import measure_socal
 from flexical.socal.socal import Socal
 
