@@ -1,11 +1,11 @@
 from unittest.case import TestCase
 
-from flexical.lexicons import load_oplexicon, load_sentilex, load_flexical
+from flexical.lexicons import oplexicon, sentilex, flexical_lexicon
 
 
 class LoadOplexiconTest(TestCase):
     def test_return_lexicon_in_expected_format(self):
-        lexicon = load_oplexicon()
+        lexicon = oplexicon()
 
         self.assertIsInstance(lexicon, dict)
 
@@ -14,7 +14,7 @@ class LoadOplexiconTest(TestCase):
             self.assertIn(entry[1], (-1, 1))
 
     def test_return_stemmed_lexicon_in_expected_format(self):
-        lexicon = load_oplexicon(stem_words=True)
+        lexicon = oplexicon(stem_words=True)
 
         self.assertIsInstance(lexicon, dict)
 
@@ -25,7 +25,7 @@ class LoadOplexiconTest(TestCase):
 
 class LoadSentilexTest(TestCase):
     def test_return_lexicon_in_expected_format(self):
-        lexicon = load_sentilex()
+        lexicon = sentilex()
 
         self.assertIsInstance(lexicon, dict)
 
@@ -34,7 +34,7 @@ class LoadSentilexTest(TestCase):
             self.assertIn(entry[1], (-1, 1))
 
     def test_return_stemmed_lexicon_in_expected_format(self):
-        lexicon = load_sentilex(stem_words=True)
+        lexicon = sentilex(stem_words=True)
 
         self.assertIsInstance(lexicon, dict)
 
@@ -45,7 +45,7 @@ class LoadSentilexTest(TestCase):
 
 class LoadFlexicalTest(TestCase):
     def test_return_lexicon_in_expected_format(self):
-        lexicon = load_flexical(stem_words=False)
+        lexicon = flexical_lexicon(stem_words=False)
 
         self.assertIsInstance(lexicon, dict)
 
@@ -54,7 +54,7 @@ class LoadFlexicalTest(TestCase):
             self.assertIn(entry[1], (-1, 1))
 
     def test_return_stemmed_lexicon_in_expected_format(self):
-        lexicon = load_flexical(stem_words=True)
+        lexicon = flexical_lexicon(stem_words=True)
 
         self.assertIsInstance(lexicon, dict)
 

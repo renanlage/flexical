@@ -5,7 +5,7 @@ from flexical.text_processing.preprocess import remove_accents, stem_word, prepr
 from flexical.text_processing.spelling_correction import remove_repeated_letters
 
 
-def load_reli_reviews_with_polarity(stem_words=False, ignored_words=()):
+def reli_reviews(stem_words=False, ignored_words=()):
     reviews = []
     polarities = []
     word_transforms = [remove_repeated_letters, remove_accents]

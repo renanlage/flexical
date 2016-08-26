@@ -1,10 +1,10 @@
 from unittest.case import TestCase
 
-from flexical.data.reli import load_reli_reviews_with_polarity
+from flexical.data.reli import reli_reviews
 
 
 class ReliTest(TestCase):
     def test_reli_load_data_correctly(self):
-        reviews, polarities = load_reli_reviews_with_polarity()
+        reviews, polarities = reli_reviews()
 
         self.assertEqual(len(reviews), len(polarities))

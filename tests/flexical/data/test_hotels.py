@@ -1,11 +1,11 @@
 from unittest import TestCase
 
-from flexical.data.hotels import load_hotel_reviews_with_polarity, merge_hotels_reviews_to_one_file
+from flexical.data.hotels import hotel_reviews, merge_hotels_reviews_to_one_file
 
 
 class LoadHotelReviewsTest(TestCase):
     def test_return_reviews_with_polarities_associated_by_index(self):
-        reviews, polarities = load_hotel_reviews_with_polarity(stem_words=False)
+        reviews, polarities = hotel_reviews(stem_words=False)
 
         self.assertIsInstance(reviews, list)
         self.assertIsInstance(polarities, list)
@@ -19,7 +19,7 @@ class LoadHotelReviewsTest(TestCase):
                 self.assertIsInstance(word, unicode)
 
     def test_return_stemmed_reviews_with_polarities_associated_by_index(self):
-        reviews, polarities = load_hotel_reviews_with_polarity(stem_words=True)
+        reviews, polarities = hotel_reviews(stem_words=True)
 
         self.assertIsInstance(reviews, list)
         self.assertIsInstance(polarities, list)

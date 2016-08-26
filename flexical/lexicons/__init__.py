@@ -5,7 +5,7 @@ import io
 from flexical.text_processing.preprocess import stem_word, remove_accents, apply_transforms
 
 
-def load_oplexicon(accepted_lex_types=('adj', 'emot', 'vb'), stem_words=False):
+def oplexicon(accepted_lex_types=('adj', 'emot', 'vb'), stem_words=False):
     lexicon = {}
     word_transforms = [remove_accents]
 
@@ -22,16 +22,16 @@ def load_oplexicon(accepted_lex_types=('adj', 'emot', 'vb'), stem_words=False):
     return lexicon
 
 
-def load_flexical(stem_words=False):
+def flexical_lexicon(stem_words=False):
     lexicon = {}
 
     with io.open('flexical/lexicons/flexical.csv', 'r', encoding='utf-8') as _file:
         for line in _file:
-            raw_word, score = line.split(',')
+            word, score = line.split(',')
             polarity = float(score.rstrip())
 
             if stem_words is True:
-                word = stem_word(raw_word)
+                word = stem_word(word)
 
             if polarity > 0:
                 lexicon[word] = 1
@@ -40,7 +40,7 @@ def load_flexical(stem_words=False):
     return lexicon
 
 
-def load_reli_lexicon(accepted_lex_types=('adj', 'sub', 'vb'), stem_words=False):
+def reli_lexicon(accepted_lex_types=('adj', 'sub', 'vb'), stem_words=False):
     lexicon = {}
     word_transforms = [remove_accents]
 
@@ -60,7 +60,7 @@ def load_reli_lexicon(accepted_lex_types=('adj', 'sub', 'vb'), stem_words=False)
     return lexicon
 
 
-def load_sentilex(stem_words=False):
+def sentilex(stem_words=False):
     lexicon = {}
     word_transforms = [remove_accents]
 
