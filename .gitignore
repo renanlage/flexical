@@ -91,5 +91,6 @@ ENV/
 # IDE settings
 .idea/
 
-# Ignore some lexicons
+# Ignore some project related stuff
 flexical/lexicons/flexical*
+results/

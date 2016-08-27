@@ -1,7 +1,7 @@
 from __future__ import division
 
 
-def confusion_matrix(scores, labels, average=2):
+def confusion_matrix(scores, labels, average=0):
     matrix = {'true_positive': 0, 'true_negative': 0, 'false_positive': 0, 'false_negative': 0}
 
     for i in xrange(len(scores)):

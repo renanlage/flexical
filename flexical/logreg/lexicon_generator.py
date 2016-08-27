@@ -10,7 +10,7 @@ from flexical.text_processing.bow import BowGenerator
 
 class LexiconGenerator(object):
     def __init__(self, dataset_loader, apply_socal_mask=True, mask_max_steps=10, remove_stopwords=False,
-                 ignored_words = (), stem_words=False, bias=0, threshold=0.27):
+                 ignored_words=(), stem_words=False, bias=0, threshold=0.27):
         self.dataset_loader = dataset_loader
         self.stem_words = stem_words
         self.mask_max_steps = mask_max_steps
@@ -36,16 +36,31 @@ class LexiconGenerator(object):
 
         if filename:
             self.export_lexicon_to_file(filename, vocabulary, coefs)
+        else:
+            return self.lexicon_as_dict(vocabulary, coefs)
 
-    def accept_word_coefficient(self, coef):
-        return coef > self.bias + self.threshold or coef < self.bias - self.threshold
+    def coefficient_to_polarity(self, coef):
+        if coef > self.bias + self.threshold:
+            return 1
+        elif coef < self.bias - self.threshold:
+            return -1
+        else:
+            return 0
 
     def export_lexicon_to_file(self, filename, vocabulary, coefficients):
         with io.open(filename, 'w', encoding='utf-8') as _file:
             for i in xrange(coefficients.size):
                 coef = coefficients[0, i]
-                if self.accept_word_coefficient(coef):
+                if self.coefficient_to_polarity(coef):
                     _file.write(u'{}, {}\n'.format(vocabulary[i], coef))
+
+    def lexicon_as_dict(self, vocabulary, coefficients):
+        lexicon = {}
+        for i in xrange(coefficients.size):
+            coef = coefficients[0, i]
+            polarity = self.coefficient_to_polarity(coef)
+            if polarity:
+                lexicon[vocabulary[i]] = polarity
 
 
 def show_high_and_low_coef_words(words_coefs, show_count=10):
