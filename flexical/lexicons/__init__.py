@@ -5,6 +5,14 @@ import io
 from flexical.text_processing.preprocess import stem_word, remove_accents, apply_transforms
 
 
+def merged_lexicons(stem_words=False):
+    lexicon = oplexicon(stem_words=stem_words)
+    lexicon.update(reli_lexicon(stem_words=stem_words))
+    lexicon.update(sentilex(stem_words=stem_words))
+
+    return lexicon
+
+
 def oplexicon(accepted_lex_types=('adj', 'emot', 'vb'), stem_words=False):
     lexicon = {}
     word_transforms = [remove_accents]

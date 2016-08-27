@@ -18,7 +18,7 @@ class Socal(object):
 
         self.irrealis = {
             "se", "caso", "poderia", "poderiamos", "poderiam", "haveria", "haveriamos", "haveriam", "teria", "teriam",
-            "teriamos"
+            "teriamos", "quisesse", "quise"
         }
         self.negators = {
             "nao", "nem", "n", "nenhum", "ninguem", "ngm" "nada", "nunca", "jamais", "tampouco"

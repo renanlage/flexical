@@ -1,12 +1,24 @@
 import itertools
 from operator import itemgetter
 
+from flexical.data import all_datasets
 from flexical.data.hotels import hotel_reviews
 from flexical.data.reli import reli_reviews
 from flexical.lexicons import oplexicon, sentilex, reli_lexicon
 from flexical.socal.measures import measure_socal
 from flexical.socal.socal import Socal
 from flexical.text_processing.file_handling import raw_write
+
+
+def dataset_loader():
+    hotel = hotel_reviews(stem_words=False)
+    hotel_stem = hotel_reviews(stem_words=True)
+
+    reli = reli_reviews(stem_words=False)
+    reli_stem = reli_reviews(stem_words=True)
+
+    merged = all_datasets(stem_words=False)
+    merged_stem = all_datasets(stem_words=True)
 
 
 def run_pilene_with_all_options():
@@ -30,20 +42,11 @@ def run_pilene_with_all_options():
         if apply_mask is False and mask_max_steps != 10:
             continue
 
-        socal = Socal(stem_words=stem_words, mask_max_steps=mask_max_steps, use_irrealis=apply_mask,
-                      use_intensifiers=apply_mask, use_negators=apply_mask)
-        scores, labels = socal.calculate_scores(lex_loader, dataset_loader)
-        acc, mcc, posfscore, wfscore = measure_socal(scores, labels)
-
-        result = [u'-' * 100,
-                  u'{:16} {:16} {:^4} {:^10} {:^8} {:2.2f}   {:2.2f}   {:2.2f}   {:2.2f}'.format(
-                      lex_loader.__name__, dataset_loader.__name__, stem_words, mask_max_steps, apply_mask,
-                      acc, mcc, posfscore, wfscore
-                  )]
-        all_results.append(u'\n'.join(result))
+        result, measure = socal_result(stem_words, mask_max_steps, apply_mask, lex_loader, dataset_loader)
+        all_results.append(result)
 
         # Save measures for latter analysis
-        results_measures.append({'index': index, 'acc': acc, 'mcc': mcc, 'posfscore': posfscore, 'wfscore': wfscore})
+        results_measures.append(measure)
 
         print index
         index += 1
@@ -56,6 +59,21 @@ def run_pilene_with_all_options():
     sorted_results = results_sorted_by(all_results, results_measures, 'acc')
     all_results_string = format_results('All results', params_header, sorted_results)
     raw_write('results/socal_pipeline.txt', 'utf-8', best_and_worst_results + all_results_string)
+
+
+def socal_result(index, stem_words, mask_max_steps, apply_mask, lex_loader, dataset_loader):
+    socal = Socal(stem_words=stem_words, mask_max_steps=mask_max_steps, use_irrealis=apply_mask,
+                  use_intensifiers=apply_mask, use_negators=apply_mask)
+    scores, labels = socal.calculate_scores(lex_loader, dataset_loader)
+    acc, mcc, posfscore, wfscore = measure_socal(scores, labels)
+
+    result = u'\n'.join([u'-' * 100, u'{:16} {:16} {:^4} {:^10} {:^8} {:2.2f}   {:2.2f}   {:2.2f}   {:2.2f}'.format(
+            lex_loader.__name__, dataset_loader.__name__, stem_words, mask_max_steps,
+            apply_mask, acc, mcc, posfscore, wfscore
+    )])
+    measure = {'index': index, 'acc': acc, 'mcc': mcc, 'posfscore': posfscore, 'wfscore': wfscore}
+
+    return result, measure
 
 
 def format_results(description_header, params_header, results):

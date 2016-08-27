@@ -1,6 +1,7 @@
 import io
 from os import path
 
+from flexical.text_processing.file_handling import raw_write
 from flexical.text_processing.preprocess import remove_accents, stem_word, preprocess_text
 from flexical.text_processing.spelling_correction import remove_repeated_letters
 
@@ -50,6 +51,18 @@ def reli_reviews(stem_words=False, ignored_words=()):
                         review_polarity = 0
 
     return reviews, polarities
+
+
+def export_reli_review_to_single_file():
+    reviews, polarities = reli_reviews()
+
+    lines = []
+
+    for i in xrange(len(reviews)):
+        reviews_str = u' '.join(reviews[i])
+        lines.append(u'{}$,${}'.format(reviews_str, polarities[i]))
+
+    raw_write('flexical/data/ReLi.txt', 'utf-8', u'\n'.join(lines))
 
 
 def polarity_to_int(polarity):
