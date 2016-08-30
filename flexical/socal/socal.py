@@ -2,11 +2,12 @@ from flexical.text_processing.preprocess import stem_word
 
 
 class Socal(object):
-    def __init__(self, stem_words=False, mask_max_steps=10, ignored_words=(),
+    def __init__(self, stem_words=False, mask_max_steps=10, ignored_words=(), apply_mask=True,
                  use_intensifiers=True, use_irrealis=True, use_negators=True):
         self.stem_words = stem_words
         self.mask_max_steps = mask_max_steps
         self.ignored_words = ignored_words
+        self.apply_mask = apply_mask
         self.use_intensifiers = use_intensifiers
         self.use_irrealis = use_irrealis
         self.use_negators = use_negators
@@ -40,16 +41,20 @@ class Socal(object):
             self.clause_breakers = {stem_word(word) for word in self.clause_breakers}
             self.words_with_no_polarity = {stem_word(word) for word in self.words_with_no_polarity}
 
-    def calculate_scores(self, lexicon_loader, dataset_loader):
-        texts, polarities = dataset_loader(stem_words=self.stem_words, ignored_words=self.ignored_words)
-        lexicon = lexicon_loader(stem_words=self.stem_words)
+    def calculate_scores(self, lexicon, dataset):
+        texts, polarities = dataset
+        lexicon = lexicon
 
         socal_scores = []
 
         for text in texts:
             socal_polarities = self.polarities(text, lexicon)
-            mask = self.mask(text)
-            individual_words_score = [polarity * mask for polarity, mask in zip(socal_polarities, mask)]
+            individual_words_score = socal_polarities
+
+            if self.apply_mask:
+                mask = self.mask(text)
+                individual_words_score = [polarity * mask for polarity, mask in zip(individual_words_score, mask)]
+
             text_score = sum(score for score in individual_words_score)
 
             socal_scores.append(text_score)

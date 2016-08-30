@@ -1,7 +1,6 @@
 from unittest.case import TestCase
 
-from flexical.data.hotels import hotel_reviews
-from flexical.data.reli import reli_reviews
+from flexical.data import hotel_reviews, reli_reviews
 from flexical.logreg.lexicon_generator import LexiconGenerator
 
 

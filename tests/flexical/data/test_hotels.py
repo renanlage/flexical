@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from flexical.data.hotels import hotel_reviews, merge_hotels_reviews_to_one_file
+from flexical.data import hotel_reviews, merge_hotels_reviews_to_one_file
 
 
 class LoadHotelReviewsTest(TestCase):

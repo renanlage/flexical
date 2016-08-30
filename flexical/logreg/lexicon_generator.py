@@ -9,9 +9,9 @@ from flexical.text_processing.bow import BowGenerator
 
 
 class LexiconGenerator(object):
-    def __init__(self, dataset_loader, apply_socal_mask=True, mask_max_steps=10, remove_stopwords=False,
+    def __init__(self, dataset, apply_socal_mask=True, mask_max_steps=10, remove_stopwords=False,
                  ignored_words=(), stem_words=False, bias=0, threshold=0.27):
-        self.dataset_loader = dataset_loader
+        self.dataset = dataset
         self.stem_words = stem_words
         self.mask_max_steps = mask_max_steps
         self.stopwords = nltk.corpus.stopwords.words('portuguese') if remove_stopwords else ()
@@ -22,7 +22,7 @@ class LexiconGenerator(object):
 
     def build_lexicon(self, filename=None):
         # Load dataset and gold labels
-        docs, polarities = self.dataset_loader(stem_words=self.stem_words, ignored_words=self.ignored_words)
+        docs, polarities = self.dataset
 
         # Represent dataset as bag of words features
         bow_generator = BowGenerator(apply_socal_mask=self.apply_socal_mask, mask_max_steps=self.mask_max_steps,
@@ -36,8 +36,8 @@ class LexiconGenerator(object):
 
         if filename:
             self.export_lexicon_to_file(filename, vocabulary, coefs)
-        else:
-            return self.lexicon_as_dict(vocabulary, coefs)
+
+        return self.lexicon_as_dict(vocabulary, coefs)
 
     def coefficient_to_polarity(self, coef):
         if coef > self.bias + self.threshold:
@@ -61,6 +61,7 @@ class LexiconGenerator(object):
             polarity = self.coefficient_to_polarity(coef)
             if polarity:
                 lexicon[vocabulary[i]] = polarity
+        return lexicon
 
 
 def show_high_and_low_coef_words(words_coefs, show_count=10):

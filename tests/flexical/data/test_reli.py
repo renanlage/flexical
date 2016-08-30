@@ -1,6 +1,6 @@
 from unittest.case import TestCase
 
-from flexical.data.reli import reli_reviews
+from flexical.data import reli_reviews
 
 
 class ReliTest(TestCase):

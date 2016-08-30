@@ -1,6 +1,6 @@
 from unittest.case import TestCase
 
-from flexical.data.hotels import hotel_reviews
+from flexical.data import hotel_reviews
 from flexical.lexicons import oplexicon
 from flexical.socal.socal import Socal
 

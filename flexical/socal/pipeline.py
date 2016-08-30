@@ -1,9 +1,7 @@
 import itertools
 from operator import itemgetter
 
-from flexical.data import all_datasets
-from flexical.data.hotels import hotel_reviews
-from flexical.data.reli import reli_reviews
+from flexical.data import all_reviews, hotel_reviews, reli_reviews
 from flexical.lexicons import oplexicon, sentilex, reli_lexicon
 from flexical.socal.measures import measure_socal
 from flexical.socal.socal import Socal
@@ -17,8 +15,8 @@ def dataset_loader():
     reli = reli_reviews(stem_words=False)
     reli_stem = reli_reviews(stem_words=True)
 
-    merged = all_datasets(stem_words=False)
-    merged_stem = all_datasets(stem_words=True)
+    merged = all_reviews(stem_words=False)
+    merged_stem = all_reviews(stem_words=True)
 
 
 def run_pilene_with_all_options():

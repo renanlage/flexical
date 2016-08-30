@@ -107,5 +107,6 @@ def measures_to_string(acc, mcc, posfscore, wfscore):
 def measure_socal(scores, labels):
     conf_matrix = confusion_matrix(scores, labels)
 
-    return (accuracy(conf_matrix), mathews_correlation_coefficient(conf_matrix),
-            fscore(conf_matrix), weighted_fscore(conf_matrix))
+    measures = (accuracy(conf_matrix), mathews_correlation_coefficient(conf_matrix),
+                fscore(conf_matrix), weighted_fscore(conf_matrix))
+    return [round(measure, 2) for measure in measures]
