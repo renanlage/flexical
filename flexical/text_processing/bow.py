@@ -53,10 +53,11 @@ class BowGenerator(CountVectorizer):
                         continue
 
                     # j_incides for a doc: [2, 10, 9, 102, 65]
-                    j_indices.append(vocabulary[feature])
+                    if not fixed_vocab or feature in vocabulary:
+                        j_indices.append(vocabulary[feature])
 
-                    if self.apply_socal_mask:
-                        values.append(doc_mask[index])
+                        if self.apply_socal_mask:
+                            values.append(doc_mask[index])
 
                 except KeyError:
                     # Ignore out-of-vocabulary items for fixed_vocab=True

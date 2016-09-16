@@ -67,22 +67,22 @@ class Socal(object):
     def mask(self, text):
         mask = [1] * len(text)
 
-        for index, word in enumerate(text):
+        for i, word in enumerate(text):
             if self.use_intensifiers and word in self.intensifiers:
-                start_index = self.index_of_previous_clause_break(text, index) + 1
-                end_index = self.index_of_next_clause_break(text, index)
-                self.apply_multiplier_to_mask(mask, self.intensifiers[word], start_index, end_index)
+                start_index = self.index_of_previous_clause_break(text, i) + 1
+                end_index = self.index_of_next_clause_break(text, i)
+                self.apply_multiplier_to_mask(mask, self.intensifiers[word], start_index, end_index, skip_index=i)
 
             elif self.use_irrealis and word in self.irrealis:
-                end_index = self.index_of_next_clause_break(text, index, is_irrealis=True)
-                self.apply_multiplier_to_mask(mask, 0, index + 1, end_index)
+                end_index = self.index_of_next_clause_break(text, i, is_irrealis=True)
+                self.apply_multiplier_to_mask(mask, 0, i + 1, end_index)
 
             elif self.use_negators and word in self.negators:
-                end_index = self.index_of_next_clause_break(text, index)
-                self.apply_multiplier_to_mask(mask, -1, index + 1, end_index)
+                end_index = self.index_of_next_clause_break(text, i)
+                self.apply_multiplier_to_mask(mask, -1, i + 1, end_index)
 
         # Nullify words with no polarity in mask
-        mask = [0 if text[i] in self.words_with_no_polarity else word_mask for i, word_mask in enumerate(mask)]
+        # mask = [0 if text[i] in self.words_with_no_polarity else word_mask for i, word_mask in enumerate(mask)]
         return mask
 
     def index_of_next_clause_break(self, words_vec, start_index, is_irrealis=False):
@@ -103,6 +103,9 @@ class Socal(object):
                 return i
         return min_index
 
-    def apply_multiplier_to_mask(self, mask, multiplier, start_index, end_index):
+    def apply_multiplier_to_mask(self, mask, multiplier, start_index, end_index, skip_index=None):
         for i in xrange(start_index, end_index):
+            if skip_index and i == skip_index:
+                continue
+
             mask[i] *= multiplier

@@ -26,7 +26,8 @@ def oplexicon(accepted_lex_types=('adj', 'emot', 'vb'), stem_words=False):
 
             if score != "0" and lex_type in accepted_lex_types:
                 word = apply_transforms(raw_word, word_transforms)
-                lexicon[word] = int(score)
+                polarity = int(score)
+                lexicon[word] = polarity if polarity >= 0 else polarity * 1.5
     return lexicon
 
 
@@ -41,10 +42,7 @@ def flexical_lexicon(stem_words=False):
             if stem_words is True:
                 word = stem_word(word)
 
-            if polarity > 0:
-                lexicon[word] = 1
-            elif polarity < 0:
-                lexicon[word] = -1
+            lexicon[word] = polarity
     return lexicon
 
 
@@ -64,7 +62,7 @@ def reli_lexicon(accepted_lex_types=('adj', 'sub', 'vb'), stem_words=False):
 
             polarity = int(polarity_str.rstrip())
             word = apply_transforms(raw_word, word_transforms)
-            lexicon[word] = polarity
+            lexicon[word] = polarity if polarity >= 0 else polarity * 1.5
     return lexicon
 
 
@@ -82,5 +80,6 @@ def sentilex(stem_words=False):
 
             if polarity != 0:
                 word = apply_transforms(raw_word, word_transforms)
-                lexicon[word] = polarity
+                lexicon[word] = polarity if polarity >= 0 else polarity * 1.5
+
     return lexicon

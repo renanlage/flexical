@@ -92,5 +92,3 @@ ENV/
 .idea/
 
 # Ignore some project related stuff
-flexical/lexicons/flexical*
-results/

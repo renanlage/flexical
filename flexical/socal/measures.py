@@ -71,7 +71,9 @@ def mathews_correlation_coefficient(confusion_matrix):
     fp = confusion_matrix['false_positive']
     fn = confusion_matrix['false_negative']
 
-    return (tp*tn - fp*fn) / ((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn))**0.5
+    divisor = ((tp+fp)*(tp+fn)*(tn+fp)*(tn+fn))**0.5
+
+    return (tp*tn - fp*fn) / divisor if divisor != 0 else 0
 
 
 def fscore(confusion_matrix, negative=True):
@@ -82,7 +84,7 @@ def fscore(confusion_matrix, negative=True):
         prec = precision(confusion_matrix)
         rec = recall(confusion_matrix)
 
-    return 2 * prec * rec / (prec + rec)
+    return 2 * prec * rec / (prec + rec) if prec + rec != 0 else 0
 
 
 def weighted_fscore(confusion_matrix):

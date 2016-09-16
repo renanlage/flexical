@@ -12,4 +12,4 @@ def lex_gen():
 
 
 if __name__ == "__main__":
-    lex_gen()
+    lexicon_generator_pipeline()
