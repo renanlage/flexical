@@ -90,6 +90,8 @@ class LexiconGenerator(object):
         return lexicon
 
     def coefficient_is_valid(self, coef):
+        if not coef:
+            return False
         return coef > self.bias + self.threshold or coef < self.bias - self.threshold
 
     def normalized_lexicon_as_dict(self, vocabulary, coefficients):
@@ -99,7 +101,7 @@ class LexiconGenerator(object):
         for i in xrange(coefficients.size):
             coef = coefficients[0, i]
             if self.coefficient_is_valid(coef):
-                lexicon.append([vocabulary[i], coef])
+                lexicon.append((vocabulary[i], coef))
                 if coef < old_min:
                     old_min = coef
                 if coef > old_max:
@@ -113,9 +115,9 @@ class LexiconGenerator(object):
         def normalize_coef(coef):
             if coef > OUTLIER_LIMIT:
                 return new_max
-            if coef < -OUTLIER_LIMIT:
+            if coef < -1 * OUTLIER_LIMIT:
                 return new_min
-            return (((self.get_coef(coef) - old_min) * new_range) / old_range) + new_min
+            return self.get_coef((((coef - old_min) * new_range) / old_range) + new_min)
 
         return {word: normalize_coef(coef) for word, coef in lexicon}
 

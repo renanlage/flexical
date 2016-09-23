@@ -8,13 +8,16 @@ from flexical.socal.socal import Socal
 from flexical.text_processing.file_handling import raw_write
 
 
-DATASETS = {'hotel': hotel_reviews(), 'reli': reli_reviews(), 'all': all_reviews(),
-            'hotel_stem': hotel_reviews(stem_words=True), 'reli_stem': reli_reviews(stem_words=True),
-            'all_stem': all_reviews(stem_words=True)}
+DATASETS = {'hotel': hotel_reviews(), 'reli': reli_reviews(),
+            # 'all': all_reviews(),
+            # 'hotel_stem': hotel_reviews(stem_words=True), 'reli_stem': reli_reviews(stem_words=True),
+            # 'all_stem': all_reviews(stem_words=True)
+            }
 
 LEXICONS = {'oplexicon': oplexicon(), 'sentilex': sentilex(), 'reli_lex': reli_lexicon(),
-            'oplexicon_stem': oplexicon(stem_words=True), 'sentilex_stem': sentilex(stem_words=True),
-            'reli_lex_stem': reli_lexicon(stem_words=True)}
+            # 'oplexicon_stem': oplexicon(stem_words=True), 'sentilex_stem': sentilex(stem_words=True),
+            # 'reli_lex_stem': reli_lexicon(stem_words=True)
+            }
 
 
 def dataset_loader(dataset_repr, stem_words):
@@ -28,14 +31,15 @@ def lexicon_loader(lexicon_repr, stem_words):
     if stem_words:
         lexicon_repr += '_stem'
 
-    return DATASETS.get(lexicon_repr)
+    return LEXICONS.get(lexicon_repr)
 
 
 def run_pilene_with_all_options():
     lex_repr_values = ('oplexicon', 'sentilex', 'reli_lex')
-    dataset_repr_values = ('hotel', 'reli', 'all')
-    stem_words_values = apply_mask_values = (True,)
-    mask_max_steps_values = range(2, 16)
+    dataset_repr_values = ('hotel', 'reli')
+    stem_words_values = (False,)
+    apply_mask_values = (True,)
+    mask_max_steps_values = (6,)
 
     all_results = []
     results_measures = []
@@ -47,14 +51,12 @@ def run_pilene_with_all_options():
                                  stem_words_values,
                                  mask_max_steps_values,
                                  apply_mask_values):
-        # Just run for one mask_max_steps value if no need to apply mask
-        # The others runs would be the same as mask_max_steps is not used if no mask is applied
-        if apply_mask is False and mask_max_steps != mask_max_steps_values[0]:
-            continue
-
         result, measure = socal_result(index, stem_words, mask_max_steps, apply_mask,
                                        lex_repr, lexicon_loader(lex_repr, stem_words),
                                        dataset_repr, dataset_loader(dataset_repr, stem_words))
+        if not result:
+            continue
+
         all_results.append(result)
 
         # Save measures for latter analysis
@@ -74,6 +76,14 @@ def run_pilene_with_all_options():
 
 
 def socal_result(index, stem_words, mask_max_steps, apply_mask, lex_repr, lexicon, dataset_repr, dataset):
+    if not lexicon:
+        print 'Lexicon of size 0: {}'.format(lex_repr)
+        return None, None
+
+    if not dataset:
+        print 'Dataset of size 0: {}'.format(dataset_repr)
+        return None, None
+
     socal = Socal(stem_words=stem_words, mask_max_steps=mask_max_steps, use_irrealis=apply_mask,
                   use_intensifiers=apply_mask, use_negators=apply_mask)
     scores, labels = socal.calculate_scores(lexicon, dataset)

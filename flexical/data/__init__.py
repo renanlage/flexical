@@ -94,7 +94,7 @@ def merge_hotels_reviews_to_one_file():
                 _file.write(u'{}\n{}'.format(review, rating))
 
 
-def reli_reviews(stem_words=False, ignored_words=()):
+def reli_reviews(stem_words=False, ignored_words=(), accepted_pos=None):
     reviews = []
     polarities = []
     word_transforms = [remove_repeated_letters, remove_accents]
@@ -124,11 +124,14 @@ def reli_reviews(stem_words=False, ignored_words=()):
 
                     if stripped_line:
                         word_info = stripped_line.split('\t')
-                        word = word_info[0]
-                        word_polarity = polarity_to_int(word_info[4])
+                        pos_tag = word_info[1]
 
-                        review_words.append(word)
-                        review_polarity += word_polarity
+                        if accepted_pos is None or accepted_pos == pos_tag:
+                            word = word_info[0]
+                            word_polarity = polarity_to_int(word_info[4])
+
+                            review_words.append(word)
+                            review_polarity += word_polarity
                     else:
                         if review_polarity != 0:
                             review = list(preprocess_text(u' '.join(review_words), word_transforms, ignored_words))

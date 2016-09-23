@@ -1,5 +1,4 @@
 import itertools
-from operator import itemgetter
 
 from flexical.data import hotel_reviews, reli_reviews, all_reviews
 from flexical.logreg.lexicon_generator import LexiconGenerator
@@ -14,7 +13,7 @@ from flexical.text_processing.file_handling import raw_write
 # in datasets: hotel, reli, all
 
 DATASETS = {
-    # 'hotel': hotel_reviews(),
+    'hotel': hotel_reviews(),
     'reli': reli_reviews(),
     # 'all': all_reviews(),
     # 'hotel_stem': hotel_reviews(stem_words=True),
@@ -27,10 +26,10 @@ DATASETS = {
 # fix positive bias -> true, false
 
 
-PARAMS_HEADER = u'{:11} {:11} {:7} {:4} {:11} {:5} {:5} {:8} {:8} {:8} {:10} {:8} {:6} {:6} {:6} {:6}'.format(
-    'in_data', 'out_data', 'len_lex', 'stem', 'mask_steps', 'bias', 'thresh', 'penalty', 'fix_bias', 'lex_type', 'apply_mask', 'rm_stopw', 'acc', 'mcc', 'fsc', 'wfsc'
+PARAMS_HEADER = u'{:5} {:11} {:11} {:7} {:4} {:11} {:7} {:5} {:8} {:8} {:10} {:10} {:8} {:6} {:6} {:6} {:6}'.format(
+    'index', 'in_data', 'out_data', 'len_lex', 'stem', 'mask_steps', 'bias', 'thresh', 'penalty', 'fix_bias', 'lex_type', 'apply_mask', 'rm_stopw', 'acc', 'mcc', 'fsc', 'wfsc'
 )
-PARAMS_VALUES = u'{:11} {:11} {:^7} {:^4} {:^11} {:3.2f}   {:3.2f} {:^8} {:^8} {:^8} {:^10} {:^8} {:2.2f}   {:2.2f}   {:2.2f}   {:2.2f}'
+PARAMS_VALUES = u'{:^5} {:11} {:11} {:^7} {:^4} {:^11} {:3.2f}   {:3.2f} {:^8} {:^8} {:10} {:^10} {:^8} {:2.2f}   {:2.2f}   {:2.2f}   {:2.2f}'
 
 
 def dataset_loader(dataset_repr, stem_words):
@@ -44,15 +43,19 @@ def lexicon_generator_pipeline():
     print 'loading stuff...'
 
     logreg_dataset_repr_values = ('reli',)
-    socal_dataset_repr_values = ('reli',)
+    socal_dataset_repr_values = ('reli', 'hotel')
     stem_words_values = (False,)
     apply_socal_mask_values = (True,)
     remove_stopwords_values = (True,)
     mask_max_steps_values = (6,)
-    fix_positive_bias = (True,)
-    lex_type_values = ('binary', 'raw', 'normalized')
-    bias_values = list(frange(-2.0, 1.0, 0.2))
-    threshold_values = list(frange(0.0, 0.80, 0.1))
+    # mask_max_steps_values = range(2,21)
+    fix_positive_bias = (False,)
+    lex_type_values = ('raw',)
+    # lex_type_values = ('raw', 'normalized', 'binary')
+    bias_values = list(frange(-1.7, 0.0, 0.3))
+    # bias_values = (-0.2, -0.5,)
+    threshold_values = list(frange(0, 0.90, 0.1))
+    # threshold_values = (0.3, 0.1, 0.8)
     penalty_values = ('l2',)
 
     file_strs = []
@@ -86,7 +89,7 @@ def lexicon_generator_pipeline():
             if logreg_dataset_repr == socal_dataset_repr:
                 result, measure = cross_validate(index, dataset_loader(logreg_dataset_repr, stem_words),
                                                  logreg_dataset_repr, stem_words, mask_max_steps, apply_mask,
-                                                 remove_stopwords, bias, threshold, penalty)
+                                                 remove_stopwords, bias, threshold, penalty, fix_bias, lex_type)
                 results.append(result)
                 # Save measures for latter analysis
                 results_measures.append(measure)
@@ -110,7 +113,8 @@ def lexicon_generator_pipeline():
 
                 result, measure = socal_result(index, lexicon, dataset_loader(socal_dataset_repr, stem_words),
                                                logreg_dataset_repr, socal_dataset_repr, stem_words, mask_max_steps,
-                                               apply_mask, remove_stopwords, bias, threshold, penalty)
+                                               apply_mask, remove_stopwords, bias, threshold, penalty, fix_bias,
+                                               lex_type)
             except Exception as e:
                 print e
                 result = e.message
@@ -174,10 +178,10 @@ def cross_validate(index, dataset, dataset_repr, stem_words, mask_max_steps, app
     acc, mcc, posfscore, wfscore, len_lex = [avg_measures[measure] / n_tests for measure in ('acc', 'mcc', 'posfscore', 'wfscore', 'len_lex')]
 
     result = u'\n'.join(
-        [u'-' * 120,
+        [u'-' * 150,
          PARAMS_VALUES.format(
-             dataset_repr, 'cross', len_lex, stem_words, mask_max_steps, bias, threshold, penalty,
-             apply_mask, remove_stopwords, acc, mcc, posfscore, wfscore
+             index, dataset_repr, 'cross', len_lex, stem_words, mask_max_steps, bias, threshold, penalty, fix_bias,
+             lex_type, apply_mask, remove_stopwords, acc, mcc, posfscore, wfscore
          )])
     measure = {'index': index, 'acc': acc, 'mcc': mcc, 'posfscore': posfscore, 'wfscore': wfscore}
 
@@ -185,17 +189,17 @@ def cross_validate(index, dataset, dataset_repr, stem_words, mask_max_steps, app
 
 
 def socal_result(index, lexicon, dataset, logreg_dataset_repr, socal_dataset_repr, stem_words, mask_max_steps,
-                 apply_mask, remove_stopwords, bias, threshold, penalty, ):
+                 apply_mask, remove_stopwords, bias, threshold, penalty, fix_bias, lex_type):
     socal = Socal(stem_words=stem_words, mask_max_steps=mask_max_steps, apply_mask=apply_mask)
     scores, labels = socal.calculate_scores(lexicon, dataset)
 
     acc, mcc, posfscore, wfscore = measure_socal(scores, labels)
 
     result = u'\n'.join(
-        [u'-' * 120,
+        [u'-' * 150,
          PARAMS_VALUES.format(
-             logreg_dataset_repr, socal_dataset_repr, len(lexicon), stem_words, mask_max_steps, bias, threshold,
-             penalty, apply_mask, remove_stopwords, acc, mcc, posfscore, wfscore
+             index, logreg_dataset_repr, socal_dataset_repr, len(lexicon), stem_words, mask_max_steps, bias, threshold,
+             penalty, fix_bias, lex_type, apply_mask, remove_stopwords, acc, mcc, posfscore, wfscore
          )])
     measure = {'index': index, 'acc': acc, 'mcc': mcc, 'posfscore': posfscore, 'wfscore': wfscore}
 
@@ -203,7 +207,7 @@ def socal_result(index, lexicon, dataset, logreg_dataset_repr, socal_dataset_rep
 
 
 def format_results(description_header, params_header, results):
-    return '\n'.join(['\n\n', '#' * 120, description_header, '\n', params_header, u'\n'.join(results)])
+    return '\n'.join(['\n\n', '#' * 150, description_header, '\n', params_header, u'\n'.join(results)])
 
 
 def best_and_worst_positioned(results, measures, params_header, max=5):
@@ -224,8 +228,7 @@ def best_and_worst_positioned(results, measures, params_header, max=5):
 
 
 def results_sorted_by(results, measures, max=None):
-    measures.sort(key=itemgetter('acc', 'mcc'), reverse=True)
-    measures.sort(key=itemgetter('acc', 'mcc'), reverse=True)
+    measures.sort(key=lambda x: (x['mcc'], x['acc']), reverse=True)
     results = [results[measure['index']] for measure in measures]
 
     if not max:
